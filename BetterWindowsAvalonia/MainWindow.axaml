@@ -1,0 +1,73 @@
+<ui:FAAppWindow xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:ui="using:FluentAvalonia.UI.Controls"
+                x:Class="BetterWindows.MainWindow"
+                Title="BetterWindows"
+                Icon="/Assets/AppIcon.ico"
+                Width="1180" Height="820" MinWidth="720" MinHeight="560"
+                WindowStartupLocation="CenterScreen"
+                WindowState="Maximized">
+
+    <Grid RowDefinitions="40,*">
+        <!-- eigene Titelleiste (Fenster-Schaltflaechen zeichnet FAAppWindow) -->
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="14,0" VerticalAlignment="Center" IsHitTestVisible="False">
+            <Image Source="/Assets/AppIcon.png" Width="18" Height="18" />
+            <TextBlock Text="BetterWindows" Classes="caption" VerticalAlignment="Center" />
+            <TextBlock x:Name="ModeText" Classes="caption tertiary" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <ui:FANavigationView x:Name="Nav" Grid.Row="1"
+                             PaneDisplayMode="Auto" OpenPaneLength="230"
+                             IsSettingsVisible="False" IsBackButtonVisible="False"
+                             SelectionChanged="OnNavSelectionChanged">
+            <ui:FANavigationView.MenuItems>
+                <ui:FANavigationViewItem x:Name="NavTweaks" Tag="tweaks">
+                    <ui:FANavigationViewItem.IconSource>
+                        <ui:FAFontIconSource Glyph="&#xE713;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                    </ui:FANavigationViewItem.IconSource>
+                </ui:FANavigationViewItem>
+                <ui:FANavigationViewItem x:Name="NavApps" Tag="apps">
+                    <ui:FANavigationViewItem.IconSource>
+                        <ui:FAFontIconSource Glyph="&#xE74D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                    </ui:FANavigationViewItem.IconSource>
+                </ui:FANavigationViewItem>
+                <ui:FANavigationViewItem x:Name="NavPrograms" Tag="programs">
+                    <ui:FANavigationViewItem.IconSource>
+                        <ui:FAFontIconSource Glyph="&#xE7B8;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                    </ui:FANavigationViewItem.IconSource>
+                </ui:FANavigationViewItem>
+                <ui:FANavigationViewItem x:Name="NavContextMenu" Tag="contextmenu">
+                    <ui:FANavigationViewItem.IconSource>
+                        <ui:FAFontIconSource Glyph="&#xE8FD;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                    </ui:FANavigationViewItem.IconSource>
+                </ui:FANavigationViewItem>
+                <ui:FANavigationViewItem x:Name="NavStartup" Tag="startup">
+                    <ui:FANavigationViewItem.IconSource>
+                        <ui:FAFontIconSource Glyph="&#xE7E8;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                    </ui:FANavigationViewItem.IconSource>
+                </ui:FANavigationViewItem>
+            </ui:FANavigationView.MenuItems>
+            <ui:FANavigationView.FooterMenuItems>
+                <ui:FANavigationViewItem x:Name="NavBackups" Tag="backups">
+                    <ui:FANavigationViewItem.IconSource>
+                        <ui:FAFontIconSource Glyph="&#xE81C;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                    </ui:FANavigationViewItem.IconSource>
+                </ui:FANavigationViewItem>
+                <ui:FANavigationViewItem x:Name="NavSettings" Tag="settings">
+                    <ui:FANavigationViewItem.IconSource>
+                        <ui:FAFontIconSource Glyph="&#xE115;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                    </ui:FANavigationViewItem.IconSource>
+                </ui:FANavigationViewItem>
+            </ui:FANavigationView.FooterMenuItems>
+
+            <Grid RowDefinitions="Auto,*">
+                <ui:FAInfoBar x:Name="AdminBar" Severity="Warning" IsClosable="False" Margin="32,8,32,0">
+                    <ui:FAInfoBar.ActionButton>
+                        <Button x:Name="RelaunchButton" Click="OnRelaunchAdmin" />
+                    </ui:FAInfoBar.ActionButton>
+                </ui:FAInfoBar>
+                <ContentControl x:Name="PageHost" Grid.Row="1" />
+            </Grid>
+        </ui:FANavigationView>
+    </Grid>
+</ui:FAAppWindow>

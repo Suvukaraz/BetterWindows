@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:core="using:BetterWindows.Core"
+             xmlns:l="using:BetterWindows.Views"
+             x:Class="BetterWindows.Views.StartupView">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="32,16,32,16" MaxWidth="1040">
+        <StackPanel Spacing="6">
+            <TextBlock Text="{l:Tr En='Startup apps', De='Autostart'}" Classes="title" />
+            <TextBlock Classes="secondary" TextWrapping="Wrap"
+                       Text="{l:Tr En='Programs that start automatically when you sign in. Turning them off works like in Task Manager and can be undone at any time. Fewer startup apps = faster boot and more free memory.', De='Programme, die bei der Anmeldung automatisch starten. Ausschalten funktioniert wie im Task-Manager und lässt sich jederzeit wieder einschalten. Weniger Autostart = schnellerer Start und mehr freier Arbeitsspeicher.'}" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,16,0,0">
+            <TextBox x:Name="SearchBox" PlaceholderText="{l:Tr En='Search by name, publisher or command', De='Suchen nach Name, Hersteller oder Befehl'}" TextChanged="OnSearchChanged" />
+            <ComboBox x:Name="FilterBox" Grid.Column="1" SelectedIndex="0" MinWidth="150" Margin="8,0,0,0" SelectionChanged="OnFilterChanged">
+                <ComboBoxItem Content="{l:Tr En='All', De='Alle'}" />
+                <ComboBoxItem Content="{l:Tr En='Enabled only', De='Nur aktive'}" />
+                <ComboBoxItem Content="{l:Tr En='Disabled only', De='Nur deaktivierte'}" />
+            </ComboBox>
+            <Button Grid.Column="2" Margin="8,0,0,0" Click="OnRefresh" ToolTip.Tip="{l:Tr En='Refresh', De='Aktualisieren'}">
+                <TextBlock Classes="icon" Text="&#xE72C;" />
+            </Button>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Spacing="6" Margin="0,10,0,6">
+            <TextBlock x:Name="SummaryText" Classes="caption secondary" />
+            <ui:FAInfoBar x:Name="Status" IsOpen="False" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="3">
+            <ItemsControl x:Name="ItemsList">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="core:StartupItem">
+                        <Border Classes="card" Padding="14,10" Margin="0,2">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                <Panel Width="32" Height="32" VerticalAlignment="Center">
+                                    <TextBlock Classes="icon tertiary" Text="&#xE7AC;" FontSize="22" HorizontalAlignment="Center" />
+                                    <Image Source="{Binding Icon}" Width="32" Height="32" />
+                                </Panel>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1" Margin="14,0">
+                                    <TextBlock Text="{Binding Name}" Classes="strong" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Subtitle}" Classes="caption secondary" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Command}" Classes="caption tertiary mono" TextTrimming="CharacterEllipsis"
+                                               ToolTip.Tip="{Binding Command}" />
+                                </StackPanel>
+
+                                <ToggleSwitch Grid.Column="2" VerticalAlignment="Center" OnContent="{l:Tr En='On', De='Aktiv'}" OffContent="{l:Tr En='Off', De='Aus'}"
+                                              IsChecked="{Binding IsEnabled, Mode=OneWay}" IsEnabled="{Binding CanModify}"
+                                              ToolTip.Tip="{Binding ToolTipText}"
+                                              IsCheckedChanged="OnItemToggled" />
+
+                                <Button Grid.Column="3" VerticalAlignment="Center" Margin="8,0,0,0" Background="Transparent" BorderThickness="0"
+                                        ToolTip.Tip="{l:Tr En='More actions', De='Weitere Aktionen'}">
+                                    <TextBlock Classes="icon" Text="&#xE712;" />
+                                    <Button.Flyout>
+                                        <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                            <MenuItem Header="{l:Tr En='Open file location', De='Speicherort öffnen'}" Tag="{Binding}" IsEnabled="{Binding HasLocation}" Click="OnOpenLocation" />
+                                            <MenuItem Header="{l:Tr En='Copy command', De='Befehl kopieren'}" Tag="{Binding}" Click="OnCopyCommand" />
+                                            <Separator />
+                                            <MenuItem Header="{l:Tr En='Remove entry …', De='Eintrag entfernen …'}" Tag="{Binding}" IsEnabled="{Binding CanDelete}" Click="OnDelete" />
+                                        </MenuFlyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

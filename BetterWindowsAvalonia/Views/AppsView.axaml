@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:l="using:BetterWindows.Views"
+             x:Class="BetterWindows.Views.AppsView">
+    <ScrollViewer>
+        <StackPanel Margin="32,16,32,32" Spacing="6" MaxWidth="1040">
+            <TextBlock Text="Bloat Apps" Classes="title" />
+            <TextBlock Classes="secondary" TextWrapping="Wrap"
+                       Text="{l:Tr En='Preinstalled Microsoft apps you usually do not need. They are removed for all users and from the Windows image so they do not come back after updates. You can reinstall them from the Microsoft Store at any time.', De='Vorinstallierte Microsoft-Apps, die du meist nicht brauchst. Sie werden für alle Benutzer und aus dem Windows-Image entfernt, damit sie nach Updates nicht zurückkommen. Neu installieren kannst du sie jederzeit über den Microsoft Store.'}" />
+
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,10,0,6">
+                <Button x:Name="RemoveButton" Classes="accent" Click="OnRemove">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE74D;" />
+                        <TextBlock x:Name="RemoveButtonText" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnRefresh">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE72C;" />
+                        <TextBlock Text="{l:Tr En='Refresh', De='Aktualisieren'}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <ProgressBar x:Name="Busy" IsIndeterminate="True" IsVisible="False" />
+            <ui:FAInfoBar x:Name="Status" IsOpen="False" />
+            <TextBox x:Name="LogBox" IsVisible="False" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                     FontFamily="Cascadia Mono, Consolas" FontSize="12" MaxHeight="220" />
+
+            <TextBlock Text="{l:Tr En='Installed', De='Installiert'}" Classes="subtitle" Margin="0,16,0,4" />
+            <StackPanel x:Name="InstalledPanel" Spacing="4" />
+            <TextBlock x:Name="NoneText" IsVisible="False" Classes="secondary"
+                       Text="{l:Tr En='None of the listed apps is installed.', De='Keine der aufgeführten Apps ist installiert.'}" />
+
+            <Expander Header="{l:Tr En='Not installed', De='Nicht installiert'}" Margin="0,16,0,0" HorizontalAlignment="Stretch">
+                <StackPanel x:Name="MissingPanel" Spacing="2" />
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

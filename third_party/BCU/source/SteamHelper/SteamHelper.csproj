@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<!-- BetterWindows-Aenderung: asInvoker statt requireAdministrator -->
+		<ApplicationManifest>..\helper.manifest</ApplicationManifest>
+
+		<AssemblyTitle>Utility for discovering and uninstalling games and apps installed through Steam</AssemblyTitle>
+
+		<ApplicationIcon>steam.ico</ApplicationIcon>
+		<StartupObject>SteamHelper.Program</StartupObject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\KlocTools\KlocTools.csproj" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:l="using:BetterWindows.Views"
+             x:Class="BetterWindows.Views.BackupsView">
+    <ScrollViewer>
+        <StackPanel Margin="32,16,32,32" Spacing="6" MaxWidth="1040">
+            <TextBlock Text="{l:Tr En='Backups', De='Sicherungen'}" Classes="title" />
+            <TextBlock Classes="secondary" TextWrapping="Wrap"
+                       Text="{l:Tr En='Before BetterWindows deletes anything, it creates a backup. Here you can open these folders or empty them once you are sure you no longer need the backups. Emptying moves the files to the Recycle Bin.', De='Bevor BetterWindows etwas löscht, legt es eine Sicherung an. Hier kannst du diese Ordner öffnen oder leeren, wenn du sicher bist, dass du die Sicherungen nicht mehr brauchst. Leeren verschiebt die Dateien in den Papierkorb.'}" />
+
+            <WrapPanel Margin="0,10,0,6">
+                <Button Click="OnOpenRoot" Margin="0,0,8,8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE838;" />
+                        <TextBlock Text="{l:Tr En='Open data folder', De='Datenordner öffnen'}" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnRestorePoints" Margin="0,0,8,8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE777;" />
+                        <TextBlock Text="{l:Tr En='Manage restore points', De='Wiederherstellungspunkte verwalten'}" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnRefresh" Margin="0,0,8,8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE72C;" />
+                        <TextBlock Text="{l:Tr En='Refresh', De='Aktualisieren'}" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+
+            <TextBlock x:Name="SummaryText" Classes="caption secondary" />
+            <ui:FAInfoBar x:Name="Status" IsOpen="False" />
+
+            <StackPanel x:Name="CardsPanel" Spacing="4" Margin="0,10,0,0" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

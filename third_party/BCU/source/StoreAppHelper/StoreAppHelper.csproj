@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<!-- BetterWindows-Aenderung: asInvoker statt requireAdministrator -->
+		<ApplicationManifest>..\helper.manifest</ApplicationManifest>
+
+		<AssemblyTitle>Utility for discovering and uninstalling Windows Store apps (including pre-installed apps)</AssemblyTitle>
+
+		<ApplicationIcon>icon.ico</ApplicationIcon>
+		<StartupObject>StoreAppHelper.Program</StartupObject>
+	</PropertyGroup>
+</Project>

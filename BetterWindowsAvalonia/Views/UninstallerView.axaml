@@ -1,0 +1,183 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:core="using:BetterWindows.Core"
+             xmlns:l="using:BetterWindows.Views"
+             x:Class="BetterWindows.Views.UninstallerView">
+
+    <UserControl.Styles>
+        <!-- Ansichtsumschalter als zusammenhaengende Schaltflaechengruppe -->
+        <Style Selector="StackPanel.segmented > ToggleButton">
+            <Setter Property="MinWidth" Value="110" />
+            <Setter Property="Padding" Value="14,6" />
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="StackPanel.segmented > ToggleButton:nth-child(1)">
+            <Setter Property="CornerRadius" Value="4,0,0,4" />
+        </Style>
+        <Style Selector="StackPanel.segmented > ToggleButton:nth-last-child(1)">
+            <Setter Property="CornerRadius" Value="0,4,4,0" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*" Margin="32,16,32,16" MaxWidth="1100">
+        <StackPanel Spacing="6">
+            <TextBlock Text="{l:Tr En='Programs', De='Programme'}" Classes="title" />
+            <TextBlock Classes="secondary" TextWrapping="Wrap"
+                       Text="{l:Tr En='Thorough uninstall: first the program’s own uninstaller runs, then BetterWindows looks for leftover folders, registry entries, shortcuts, services and startup entries. All leftovers are backed up before deletion.', De='Gründliche Deinstallation: Erst läuft der Deinstaller des Programms, danach sucht BetterWindows nach übrig gebliebenen Ordnern, Registry-Einträgen, Verknüpfungen, Diensten und Autostarts. Alle Reste werden vor dem Löschen gesichert.'}" />
+
+            <!-- Ansicht: Einfach / Erweitert / Experte -->
+            <Grid ColumnDefinitions="Auto,*" Margin="0,8,0,0">
+                <StackPanel x:Name="ModePanel" Classes="segmented" Orientation="Horizontal" Spacing="0">
+                    <ToggleButton x:Name="SimpleMode" Tag="simple" Click="OnModeClicked"
+                                  Content="{l:Tr En='Simple', De='Einfach'}" />
+                    <ToggleButton x:Name="MediumMode" Tag="medium" Click="OnModeClicked"
+                                  Content="{l:Tr En='Advanced', De='Erweitert'}" />
+                    <ToggleButton x:Name="ExpertMode" Tag="expert" Click="OnModeClicked"
+                                  Content="{l:Tr En='Expert', De='Experte'}" />
+                </StackPanel>
+                <TextBlock x:Name="ModeHint" Grid.Column="1" Classes="caption secondary" TextWrapping="Wrap"
+                           VerticalAlignment="Center" Margin="14,0,0,0" />
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="6" Margin="0,10,0,0">
+            <ui:FAInfoBar x:Name="Status" IsOpen="False" />
+            <StackPanel x:Name="LoadingPanel" Spacing="6" IsVisible="False">
+                <TextBlock x:Name="LoadingText" Classes="caption secondary" TextTrimming="CharacterEllipsis" />
+                <ProgressBar x:Name="LoadingBar" IsIndeterminate="True" Minimum="0" Maximum="100" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- ================= Ansicht 1: Programmliste ================= -->
+        <Grid x:Name="ProgramsView" Grid.Row="2" RowDefinitions="Auto,Auto,*" Margin="0,10,0,0">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBox x:Name="SearchBox" PlaceholderText="{l:Tr En='Search by name or publisher', De='Suchen nach Name oder Hersteller'}" TextChanged="OnSearchChanged" />
+                <ComboBox x:Name="SortBox" Grid.Column="1" SelectedIndex="0" MinWidth="190" Margin="8,0,0,0" SelectionChanged="OnSortChanged">
+                    <ComboBoxItem Content="{l:Tr En='Sort: Name', De='Sortieren: Name'}" />
+                    <ComboBoxItem Content="{l:Tr En='Sort: Size', De='Sortieren: Größe'}" />
+                    <ComboBoxItem Content="{l:Tr En='Sort: Install date', De='Sortieren: Installiert am'}" />
+                    <ComboBoxItem Content="{l:Tr En='Sort: Publisher', De='Sortieren: Hersteller'}" />
+                </ComboBox>
+                <Button Grid.Column="2" Margin="8,0,0,0" Click="OnRefresh" ToolTip.Tip="{l:Tr En='Reload list', De='Liste neu einlesen'}">
+                    <TextBlock Classes="icon" Text="&#xE72C;" />
+                </Button>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*,Auto" Margin="0,10">
+                <Button x:Name="UninstallButton" Classes="accent" Click="OnUninstallSelected" IsEnabled="False" Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE74D;" />
+                        <TextBlock x:Name="UninstallButtonText" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="LeftoversOnlyButton" Grid.Column="1" Click="OnLeftoversOnly" IsEnabled="False"
+                        ToolTip.Tip="{l:Tr En='Search for leftovers of the selected programs without running an uninstaller (e.g. for programs that were already deleted)', De='Ohne Deinstaller nur nach Resten der ausgewählten Programme suchen (z. B. bei bereits gelöschten Programmen)'}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE721;" />
+                        <TextBlock Text="{l:Tr En='Find leftovers only', De='Nur Reste suchen'}" />
+                    </StackPanel>
+                </Button>
+                <TextBlock x:Name="SummaryText" Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0" Classes="caption secondary" />
+                <CheckBox x:Name="ShowSystemBox" Grid.Column="3" Content="{l:Tr En='Show system components and updates', De='Systemkomponenten und Updates anzeigen'}"
+                          IsCheckedChanged="OnFilterChanged" />
+            </Grid>
+
+            <ScrollViewer Grid.Row="2">
+                <ItemsControl x:Name="ProgramList">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="core:InstalledProgram">
+                            <Border Classes="card" Padding="12,8" Margin="0,2">
+                                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                                    <CheckBox VerticalAlignment="Center" MinWidth="0" Margin="0,0,4,0"
+                                              IsVisible="{Binding ShowCheckBox}" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                                              IsCheckedChanged="OnProgramChecked" />
+                                    <Panel Grid.Column="1" Width="32" Height="32" Margin="0,0,12,0" VerticalAlignment="Center">
+                                        <TextBlock Classes="icon tertiary" Text="&#xE7B8;" FontSize="22" HorizontalAlignment="Center" />
+                                        <Image Source="{Binding Icon}" Width="32" Height="32" />
+                                    </Panel>
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="1" ToolTip.Tip="{Binding ToolTipText}">
+                                        <TextBlock Text="{Binding Name}" Classes="strong" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Subtitle}" Classes="caption secondary" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Tags}" Classes="caption tertiary" TextTrimming="CharacterEllipsis" IsVisible="{Binding ShowDetails}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="3" Text="{Binding SizeText}" VerticalAlignment="Center" Margin="12,0,4,0" Classes="secondary" />
+                                    <Button Grid.Column="4" Margin="12,0,0,0" VerticalAlignment="Center" IsVisible="{Binding ShowUninstallButton}"
+                                            Content="{l:Tr En='Uninstall', De='Deinstallieren'}" Tag="{Binding}" Click="OnUninstallSingle" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- ================= Ansicht 2: Deinstallation laeuft ================= -->
+        <Grid x:Name="RunView" Grid.Row="2" RowDefinitions="Auto,*" Margin="0,10,0,0" IsVisible="False">
+            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,10">
+                <TextBlock Text="{l:Tr En='Uninstalling', De='Deinstallation läuft'}" Classes="subtitle" VerticalAlignment="Center" />
+                <Button x:Name="CancelButton" Content="{l:Tr En='Cancel', De='Abbrechen'}" Click="OnCancel" />
+            </StackPanel>
+            <ScrollViewer Grid.Row="1">
+                <ItemsControl x:Name="RunList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="core:InstalledProgram">
+                            <Border Classes="card" Padding="12,8" Margin="0,2">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Image Source="{Binding Icon}" Width="24" Height="24" Margin="0,0,12,0" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="2" Text="{Binding RunState}" VerticalAlignment="Center" Classes="secondary" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- ================= Ansicht 3: Reste ================= -->
+        <Grid x:Name="LeftoverView" Grid.Row="2" RowDefinitions="Auto,Auto,*" Margin="0,10,0,0" IsVisible="False">
+            <StackPanel Spacing="4">
+                <TextBlock x:Name="LeftoverTitle" Classes="subtitle" />
+                <TextBlock Classes="caption secondary" TextWrapping="Wrap"
+                           Text="{l:Tr En='Only leftovers that definitely belong to the removed program are preselected. Please check “Questionable” and “Risky” items carefully – they might still be used by other programs.', De='Vorausgewählt sind nur Reste, die sicher zum entfernten Programm gehören. Bei „Fraglich“ und „Riskant“ bitte genau prüfen – sie könnten noch von anderen Programmen genutzt werden.'}" />
+            </StackPanel>
+            <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*,Auto" Margin="0,10">
+                <Button x:Name="RemoveLeftoversButton" Classes="accent" Click="OnRemoveLeftovers">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE74D;" />
+                        <TextBlock x:Name="RemoveLeftoversText" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="1" Margin="8,0,0,0" Content="{l:Tr En='Done, remove nothing', De='Fertig, nichts entfernen'}" Click="OnSkipLeftovers" />
+                <CheckBox x:Name="ShowRiskyBox" Grid.Column="3" Content="{l:Tr En='Also show risky findings', De='Auch riskante Funde anzeigen'}" IsCheckedChanged="OnLeftoverFilterChanged" />
+            </Grid>
+            <ScrollViewer Grid.Row="2">
+                <ItemsControl x:Name="LeftoverList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="core:LeftoverItem">
+                            <Border Classes="card" Padding="12,8" Margin="0,2">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <CheckBox VerticalAlignment="Center" MinWidth="0" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                                              IsCheckedChanged="OnLeftoverChecked" />
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1" Margin="8,0,12,0" ToolTip.Tip="{Binding Details}">
+                                        <TextBlock Text="{Binding Path}" Classes="mono" FontSize="12" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Subtitle}" Classes="caption secondary" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <Border Grid.Column="2" Classes="badge">
+                                        <TextBlock Text="{Binding LevelText}" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

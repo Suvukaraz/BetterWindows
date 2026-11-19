@@ -1,0 +1,60 @@
+<Project>
+	<!--
+		Angepasste Kopie von Bulk-Crap-Uninstaller/source/Directory.Build.props (Apache-2.0).
+		Aenderungen fuer BetterWindows siehe ../MODIFICATIONS.md
+	-->
+	<PropertyGroup>
+		<Version>6.3</Version>
+
+		<Authors>https://github.com/Klocman/Bulk-Crap-Uninstaller</Authors>
+		<Copyright>Copyright Apache-2.0 © 2026</Copyright>
+
+		<Platforms>AnyCPU;x64;x86;ARM64</Platforms>
+		<TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
+
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+		<Deterministic>true</Deterministic>
+
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+
+		<GenerateManifests>false</GenerateManifests>
+		<SignManifests>false</SignManifests>
+
+		<ApplicationManifest>..\app.manifest</ApplicationManifest>
+
+		<UseAppHost>true</UseAppHost>
+		<SelfContained>false</SelfContained>
+
+		<!-- Fremdcode: Warnungen nicht in die BetterWindows-Ausgabe kippen -->
+		<WarningLevel>0</WarningLevel>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<NoWarn>$(NoWarn);CS0618;CS0612;CS1591;CA1416;NU1608;NU1701;NETSDK1206;SYSLIB0014;WFAC010</NoWarn>
+		<EnableNETAnalyzers>false</EnableNETAnalyzers>
+	</PropertyGroup>
+
+	<Import Project="HelperTools\HelperTools.projitems" Label="Shared" />
+
+	<PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+		<RuntimeIdentifier></RuntimeIdentifier>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Platform)'=='x86'">
+		<RuntimeIdentifier>win-x86</RuntimeIdentifier>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Platform)'=='x64'">
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Platform)'=='ARM64'">
+		<RuntimeIdentifier>win-arm64</RuntimeIdentifier>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\GlobalAssemblyInfo.cs"/>
+	</ItemGroup>
+</Project>

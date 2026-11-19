@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <RootNamespace>BetterWindows</RootNamespace>
+    <AssemblyName>BetterWindows</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <Version>0.5.0</Version>
+    <Authors>Suvukaraz</Authors>
+    <Copyright>Copyright © 2026 Suvukaraz – Apache License 2.0</Copyright>
+    <Description>Removes ads, unnecessary internet requests and bloat from Windows 11 – every change is reversible.</Description>
+    <Product>BetterWindows</Product>
+    <!-- Nur Englisch/Deutsch mitliefern (statt aller ~20 Sprachen aus den BCU-Bibliotheken) -->
+    <SatelliteResourceLanguages>en;de</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <!-- Portable Veroeffentlichung (publish.ps1): eine EXE, Hilfsprogramme + Lizenzen in "BetterWindows-Files" -->
+  <PropertyGroup Condition="'$(PublishSingleFile)' == 'true'">
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\AppIcon.ico" />
+    <AvaloniaResource Include="Assets\AppIcon.png" />
+    <None Remove="Assets\make-icon.ps1" />
+    <None Include="THIRD-PARTY-NOTICES.txt" Link="BetterWindows-Files\THIRD-PARTY-NOTICES.txt"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <None Include="ThirdParty\Win11ContextMenuManager\LICENSE.txt" Link="BetterWindows-Files\Licenses\Win11ContextMenuManager-LICENSE.txt"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <None Include="..\third_party\BCU\Licence.txt" Link="BetterWindows-Files\Licenses\BCU-Licence.txt"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <None Include="..\third_party\BCU\NOTICE" Link="BetterWindows-Files\Licenses\BCU-NOTICE.txt"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.6" />
+    <PackageReference Include="FluentAvaloniaUI" Version="3.1.0" />
+  </ItemGroup>
+
+  <!-- Deinstaller-Kern aus Bulk Crap Uninstaller (Apache-2.0), siehe ..\third_party\BCU -->
+  <ItemGroup>
+    <ProjectReference Include="..\third_party\BCU\source\UninstallTools\UninstallTools.csproj" />
+    <!-- Hilfsprogramme: im Entwicklungs-Build direkt daneben; bei der portablen Veroeffentlichung legt
+         publish.ps1 sie separat in "BetterWindows-Files" (sonst landen sie neben der EXE) -->
+    <ProjectReference Include="..\third_party\BCU\source\SteamHelper\SteamHelper.csproj" Condition="'$(PublishSingleFile)' != 'true'" />
+    <ProjectReference Include="..\third_party\BCU\source\StoreAppHelper\StoreAppHelper.csproj" Condition="'$(PublishSingleFile)' != 'true'" />
+  </ItemGroup>
+
+</Project>

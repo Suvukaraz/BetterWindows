@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="using:BetterWindows.Views"
+             x:Class="BetterWindows.Views.SettingsView">
+    <ScrollViewer>
+        <StackPanel Margin="32,16,32,32" Spacing="6" MaxWidth="1040">
+            <TextBlock Text="{l:Tr En='Settings', De='Einstellungen'}" Classes="title" />
+
+            <TextBlock Text="{l:Tr En='General', De='Allgemein'}" Classes="subtitle" Margin="0,20,0,4" />
+            <Border Classes="card">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Classes="icon" Text="&#xF2B7;" FontSize="20" Margin="0,0,16,0" />
+                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="{l:Tr En='Language', De='Sprache'}" Classes="strong" />
+                        <TextBlock Classes="caption secondary" TextWrapping="Wrap"
+                                   Text="{l:Tr En='Language of the app. Takes effect immediately.', De='Sprache der App. Wird sofort übernommen.'}" />
+                    </StackPanel>
+                    <ComboBox x:Name="LanguageBox" Grid.Column="2" MinWidth="160" VerticalAlignment="Center" SelectionChanged="OnLanguageChanged">
+                        <ComboBoxItem Content="English" Tag="en" />
+                        <ComboBoxItem Content="Deutsch" Tag="de" />
+                    </ComboBox>
+                </Grid>
+            </Border>
+
+            <TextBlock Text="{l:Tr En='Data', De='Daten'}" Classes="subtitle" Margin="0,20,0,4" />
+            <Border Classes="card">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Classes="icon" Text="&#xE8B7;" FontSize="20" Margin="0,0,16,0" />
+                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="{l:Tr En='Backups, log and settings', De='Sicherungen, Protokoll und Einstellungen'}" Classes="strong" />
+                        <TextBlock x:Name="DataModeText" Classes="caption secondary" TextWrapping="Wrap" />
+                        <TextBlock x:Name="DataFolderText" Classes="caption tertiary mono" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="2" Content="{l:Tr En='Open folder', De='Ordner öffnen'}" Click="OnOpenDataFolder" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <TextBlock Text="{l:Tr En='About', De='Info'}" Classes="subtitle" Margin="0,20,0,4" />
+            <Border Classes="card">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Image Source="/Assets/AppIcon.png" Width="40" Height="40" Margin="0,0,16,0" VerticalAlignment="Top" />
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock x:Name="VersionText" Classes="strong" />
+                        <TextBlock Classes="caption secondary" TextWrapping="Wrap"
+                                   Text="{l:Tr En='Removes ads, unnecessary internet requests and bloat from Windows 11 – every change is reversible.', De='Entfernt Werbung, unnötige Internetabfragen und Ballast aus Windows 11 – jede Änderung ist umkehrbar.'}" />
+                        <TextBlock Classes="caption tertiary" TextWrapping="Wrap"
+                                   Text="{l:Tr En='Includes code from Bulk Crap Uninstaller (Apache-2.0) and Windows 11 Context Menu Manager (MIT). Built with Avalonia and FluentAvalonia (MIT).', De='Enthält Code aus Bulk Crap Uninstaller (Apache-2.0) und Windows 11 Context Menu Manager (MIT). Gebaut mit Avalonia und FluentAvalonia (MIT).'}" />
+                    </StackPanel>
+                    <Button Grid.Column="2" Content="{l:Tr En='Licenses', De='Lizenzen'}" Click="OnOpenLicenses" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

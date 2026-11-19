@@ -1,0 +1,153 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:core="using:BetterWindows.Core"
+             xmlns:l="using:BetterWindows.Views"
+             x:Class="BetterWindows.Views.ContextMenuView">
+
+    <UserControl.Resources>
+        <!-- Gemeinsame Karte fuer alle Eintraege -->
+        <DataTemplate x:Key="EntryTemplate" x:DataType="core:MenuEntry">
+            <Border Classes="card" Padding="12,8" Margin="0,2">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    <Panel Width="28" Height="28" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <TextBlock Classes="icon tertiary" Text="&#xE8A5;" FontSize="18" HorizontalAlignment="Center" />
+                        <Image Source="{Binding Icon}" Width="28" Height="28" />
+                    </Panel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1" ToolTip.Tip="{Binding ToolTipText}">
+                        <TextBlock Text="{Binding Name}" Classes="strong" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Detail}" Classes="caption secondary" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Note}" Classes="caption tertiary" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasNote}" />
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0"
+                                  OnContent="{l:Tr En='Visible', De='Sichtbar'}" OffContent="{l:Tr En='Hidden', De='Ausgeblendet'}"
+                                  IsChecked="{Binding IsVisible, Mode=OneWay}" IsEnabled="{Binding CanToggle}"
+                                  IsCheckedChanged="OnEntryToggled" />
+                    <Button Grid.Column="3" VerticalAlignment="Center" Margin="8,0,0,0" Background="Transparent" BorderThickness="0"
+                            ToolTip.Tip="{l:Tr En='More actions', De='Weitere Aktionen'}">
+                        <TextBlock Classes="icon" Text="&#xE712;" />
+                        <Button.Flyout>
+                            <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                <MenuItem Header="{l:Tr En='Copy registry path', De='Registry-Pfad kopieren'}" Tag="{Binding}" IsEnabled="{Binding HasRegPath}" Click="OnCopyRegPath" />
+                                <MenuItem Header="{l:Tr En='Open in Registry Editor', De='Im Registrierungs-Editor öffnen'}" Tag="{Binding}" IsEnabled="{Binding HasRegPath}" Click="OnOpenRegedit" />
+                                <MenuItem Header="{l:Tr En='Open file location', De='Speicherort öffnen'}" Tag="{Binding}" IsEnabled="{Binding HasFilePath}" Click="OnOpenLocation" />
+                                <Separator />
+                                <MenuItem Header="{l:Tr En='Remove entry …', De='Eintrag entfernen …'}" Tag="{Binding}" IsEnabled="{Binding CanDelete}" Click="OnDelete" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <ItemsPanelTemplate x:Key="VirtualPanel">
+            <VirtualizingStackPanel />
+        </ItemsPanelTemplate>
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="32,16,32,16" MaxWidth="1100">
+        <StackPanel Spacing="6">
+            <TextBlock Text="{l:Tr En='Context menu', De='Kontextmenü'}" Classes="title" />
+            <TextBlock Classes="secondary" TextWrapping="Wrap"
+                       Text="{l:Tr En='Clean up the right-click menu. Hiding can always be undone and is stored – where possible – for your user account only. Changes usually show up in new Explorer windows or after restarting Explorer.', De='Räume das Rechtsklick-Menü auf. Ausblenden ist jederzeit umkehrbar und wird – wo möglich – nur für dein Benutzerkonto gespeichert. Änderungen werden meist erst in neuen Explorer-Fenstern oder nach einem Explorer-Neustart sichtbar.'}" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,12,0,0">
+            <TextBox x:Name="SearchBox" PlaceholderText="{l:Tr En='Search entries', De='Einträge durchsuchen'}" TextChanged="OnSearchChanged" />
+            <Button Grid.Column="1" Margin="8,0,0,0" Click="OnRefresh" ToolTip.Tip="{l:Tr En='Reload', De='Neu einlesen'}">
+                <TextBlock Classes="icon" Text="&#xE72C;" />
+            </Button>
+            <Button Grid.Column="2" Margin="8,0,0,0" Click="OnRestartExplorer">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Classes="icon" Text="&#xE777;" />
+                    <TextBlock Text="{l:Tr En='Restart Explorer', De='Explorer neu starten'}" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Spacing="6" Margin="0,10,0,4">
+            <ui:FAInfoBar x:Name="Status" IsOpen="False" />
+            <ProgressBar x:Name="Busy" IsIndeterminate="True" IsVisible="False" />
+        </StackPanel>
+
+        <TabControl x:Name="Tabs" Grid.Row="3" SelectionChanged="OnTabChanged">
+            <!-- ======== Neues Menue (Windows 11) ======== -->
+            <TabItem Header="{l:Tr En='New menu (Windows 11)', De='Neues Menü (Windows 11)'}">
+                <Grid RowDefinitions="Auto,Auto,*" Margin="0,10,0,0">
+                    <Border Classes="card">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="2" VerticalAlignment="Center">
+                                <TextBlock Text="{l:Tr En='Classic context menu instead of the Windows 11 menu', De='Klassisches Kontextmenü statt Windows-11-Menü'}" Classes="strong" />
+                                <TextBlock Classes="caption secondary" TextWrapping="Wrap"
+                                           Text="{l:Tr En='Shows the full menu right away without “Show more options”. Takes effect after restarting Explorer.', De='Zeigt sofort das vollständige Menü ohne „Weitere Optionen anzeigen“. Wirkt nach einem Explorer-Neustart.'}" />
+                            </StackPanel>
+                            <ToggleSwitch x:Name="ClassicMenuSwitch" Grid.Column="1" Margin="16,0,0,0"
+                                          OnContent="{l:Tr En='On', De='An'}" OffContent="{l:Tr En='Off', De='Aus'}"
+                                          IsCheckedChanged="OnClassicMenuToggled" />
+                        </Grid>
+                    </Border>
+                    <TextBlock Grid.Row="1" Margin="0,14,0,6" Classes="caption secondary" TextWrapping="Wrap"
+                               Text="{l:Tr En='Entries that app packages (e.g. Store apps, Terminal, Notepad, cloud services) add to the new Windows 11 menu. Hidden entries also disappear from “Show more options”.', De='Einträge, die App-Pakete (z. B. Store-Apps, Terminal, Editor, Cloud-Dienste) dem neuen Windows-11-Menü hinzufügen. Ausgeblendete Einträge verschwinden auch aus „Weitere Optionen anzeigen“.'}" />
+                    <ScrollViewer Grid.Row="2">
+                        <ItemsControl x:Name="Win11List" ItemTemplate="{StaticResource EntryTemplate}" ItemsPanel="{StaticResource VirtualPanel}" />
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <!-- ======== Klassisches Menue ======== -->
+            <TabItem Header="{l:Tr En='Classic menu', De='Klassisches Menü'}">
+                <Grid ColumnDefinitions="220,*" Margin="0,10,0,0">
+                    <ListBox x:Name="SceneList" SelectionChanged="OnSceneChanged" Margin="0,0,12,0" Background="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="core:MenuScene">
+                                <StackPanel Orientation="Horizontal" Spacing="10" ToolTip.Tip="{Binding Description}">
+                                    <TextBlock Classes="icon" Text="{Binding Glyph}" />
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Grid Grid.Column="1" RowDefinitions="Auto,*">
+                        <TextBlock x:Name="SceneHint" Classes="caption secondary" TextWrapping="Wrap" Margin="0,0,0,6" />
+                        <ScrollViewer Grid.Row="1">
+                            <ItemsControl x:Name="ClassicList" ItemTemplate="{StaticResource EntryTemplate}" ItemsPanel="{StaticResource VirtualPanel}" />
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- ======== Senden an ======== -->
+            <TabItem Header="{l:Tr En='“Send to”', De='„Senden an“'}">
+                <Grid RowDefinitions="Auto,*" Margin="0,10,0,0">
+                    <TextBlock Classes="caption secondary" TextWrapping="Wrap" Margin="0,0,0,6"
+                               Text="{l:Tr En='Entries in the “Send to” submenu (classic menu). Hidden entries are marked as hidden files.', De='Einträge im Untermenü „Senden an“ (Klassisches Menü). Ausgeblendete Einträge werden als versteckte Dateien markiert.'}" />
+                    <ScrollViewer Grid.Row="1">
+                        <ItemsControl x:Name="SendToList" ItemTemplate="{StaticResource EntryTemplate}" />
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <!-- ======== Neu ======== -->
+            <TabItem Header="{l:Tr En='“New”', De='„Neu“'}">
+                <Grid RowDefinitions="Auto,*" Margin="0,10,0,0">
+                    <TextBlock Classes="caption secondary" TextWrapping="Wrap" Margin="0,0,0,6"
+                               Text="{l:Tr En='File types in the “New” menu (right-click on the desktop or inside a folder).', De='Dateitypen im Menü „Neu“ (Rechtsklick auf Desktop oder in einen Ordner).'}" />
+                    <ScrollViewer Grid.Row="1">
+                        <ItemsControl x:Name="ShellNewList" ItemTemplate="{StaticResource EntryTemplate}" ItemsPanel="{StaticResource VirtualPanel}" />
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <!-- ======== Oeffnen mit ======== -->
+            <TabItem Header="{l:Tr En='“Open with”', De='„Öffnen mit“'}">
+                <Grid RowDefinitions="Auto,*" Margin="0,10,0,0">
+                    <TextBlock Classes="caption secondary" TextWrapping="Wrap" Margin="0,0,0,6"
+                               Text="{l:Tr En='Programs offered in the “Open with” dialog. Entries for programs that no longer exist can be removed.', De='Programme, die in der Auswahl „Öffnen mit“ angeboten werden. Einträge zu nicht mehr vorhandenen Programmen können entfernt werden.'}" />
+                    <ScrollViewer Grid.Row="1">
+                        <ItemsControl x:Name="OpenWithList" ItemTemplate="{StaticResource EntryTemplate}" ItemsPanel="{StaticResource VirtualPanel}" />
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

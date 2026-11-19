@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:l="using:BetterWindows.Views"
+             x:Class="BetterWindows.Views.TweaksView">
+    <ScrollViewer>
+        <StackPanel Margin="32,16,32,32" Spacing="6" MaxWidth="1040">
+            <TextBlock Text="{l:Tr En='Optimizations', De='Optimierungen'}" Classes="title" />
+            <TextBlock Classes="secondary" TextWrapping="Wrap"
+                       Text="{l:Tr En='Each switch shows the current state of your system. Turning it on applies the optimization, turning it off restores the previous value.', De='Jeder Schalter zeigt den aktuellen Zustand deines Systems. Einschalten wendet die Optimierung an, Ausschalten stellt den vorherigen Wert wieder her.'}" />
+
+            <WrapPanel Margin="0,10,0,6" Orientation="Horizontal">
+                <Button x:Name="ApplyRecommendedButton" Classes="accent" Click="OnApplyRecommended" Margin="0,0,8,8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE73E;" />
+                        <TextBlock Text="{l:Tr En='Apply all recommended', De='Alle empfohlenen anwenden'}" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnRestorePoint" Margin="0,0,8,8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE777;" />
+                        <TextBlock Text="{l:Tr En='Create restore point', De='Wiederherstellungspunkt erstellen'}" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnRestartExplorer" Margin="0,0,8,8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="&#xE72C;" />
+                        <TextBlock Text="{l:Tr En='Restart Explorer', De='Explorer neu starten'}" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+
+            <ProgressBar x:Name="Busy" IsIndeterminate="True" IsVisible="False" />
+            <TextBlock x:Name="SummaryText" Classes="caption secondary" />
+            <ui:FAInfoBar x:Name="Status" IsOpen="False" />
+
+            <StackPanel x:Name="CategoriesPanel" Spacing="4" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

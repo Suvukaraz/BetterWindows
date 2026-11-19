@@ -1,0 +1,24 @@
+BetterWindows – third-party notices
+====================================
+
+BetterWindows is licensed under the Apache License 2.0.
+It includes the following third-party components:
+
+1) Bulk Crap Uninstaller – UninstallTools, KlocTools, HelperTools, SteamHelper, StoreAppHelper
+   https://github.com/Klocman/Bulk-Crap-Uninstaller
+   Copyright (c) Marcin Szeniak and contributors
+   License: Apache License 2.0 (full text: Licenses/BCU-Licence.txt, notice: Licenses/BCU-NOTICE.txt)
+   Modified for BetterWindows (see third_party/BCU/MODIFICATIONS.md in the source repository).
+   The GPL-3.0 licensed component "ObjectListView" that ships with Bulk Crap Uninstaller is NOT included.
+
+2) Windows 11 Context Menu Manager – Blocks.cs, Packages.cs
+   https://github.com/branhill/windows-11-context-menu-manager
+   Copyright (c) 2024 Brandon Hill
+   License: MIT (full text: Licenses/Win11ContextMenuManager-LICENSE.txt)
+
+3) Avalonia – https://github.com/AvaloniaUI/Avalonia – License: MIT
+4) FluentAvalonia – https://github.com/amwx/FluentAvalonia – License: MIT
+
+The classic context menu management is an independent implementation. ContextMenuManager
+(https://github.com/BluePointLilac/ContextMenuManager) served as inspiration for scope and concept;
+its GPL-3.0 source code was not used.

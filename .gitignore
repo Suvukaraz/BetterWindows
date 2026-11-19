@@ -1,0 +1,23 @@
+# Build output
+bin/
+obj/
+*.user
+.vs/
+.idea/
+
+# Ready-to-run build (published as GitHub release asset instead)
+BetterWindows-App/
+
+# User data of the portable app (settings, undo data, backups, log) – never commit
+BetterWindows-Files/Data/
+**/BetterWindows-Files/Data/
+*.log
+log.txt
+backup.json
+settings.json
+removed-startup.json
+
+# Misc
+*.pdb
+Thumbs.db
+desktop.ini
